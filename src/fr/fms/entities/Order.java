@@ -1,12 +1,15 @@
 package fr.fms.entities;
 
+import java.text.DateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class Order {
 	private int idOrder;
 	private double amount;
 	private Date date;
 	private int idCustomer;
+	private static final DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.FRANCE);
 	
 	public Order(int idOrder, double amount, Date date, int idCustomer) {
 		this.idOrder = idOrder;
@@ -52,4 +55,10 @@ public class Order {
 	public void setIdCustomer(int idCustomer) {
 		this.idCustomer = idCustomer;
 	}
+
+	@Override
+	public String toString() {
+		return "Commande N°" + idOrder + ", montant=" + amount + ", date=" + df.format(date);
+	}
+	
 }

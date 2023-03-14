@@ -1,7 +1,7 @@
 /**
- * Application console de vente d'articles permettant d'exploiter une couche métier/dao pour créer un panier en ajoutant ou retirant des articles
+ * Application console de vente de formations permettant d'exploiter une couche métier/dao pour créer un panier en ajoutant ou retirant des formations
  * puis passer commande à tout instant, cela génère une commande en base avec tous les éléments associés
- * @author El babili - 2022
+ * @author Dylan De Albuquerque - 2023
  * 
  */
 package fr.fms;
@@ -10,10 +10,12 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import fr.fms.authentication.Authenticate;
+import fr.fms.business.IAdminImpl;
 import fr.fms.business.IBusinessImpl;
 import fr.fms.entities.Course;
 import fr.fms.entities.Category;
 import fr.fms.entities.Customer;
+import fr.fms.entities.Order;
 
 public class ShopApp {
 	private static Scanner scan = new Scanner(System.in); 
@@ -30,40 +32,42 @@ public class ShopApp {
 	private static final String COLUMN_PRICE = "PRIX";
 
 	private static int idUser = 0;
-	private static String login = null; 
+	private static String login = null;
 
 	public static void main(String[] args) {
 		try {
 			System.out.println("Bonjour et bienvenue dans votre plateforme de formation, \nvoici la liste des formations disponibles:\n");
 			displayCourses();
 			int choice = 0;
-			while(choice != 10) {
+			while(choice != 11) {
 				try {
-				displayMenu();
-				choice = scanInt();
-				switch(choice) {
-				case 1 : addArticleToBasket();				
-				break;					
-				case 2 : removeCourseFromBasket();
-				break;					
-				case 3 : displayCart(true);
-				break;					
-				case 4 : displayCourses();
-				break;						
-				case 5 : displayCoursesByCategoryId();
-				break;
-				case 6 : displayAllCoursesIsRemote(true);
-				break;
-				case 7 : displayAllCoursesIsRemote(false);
-				break;
-				case 8 : searchByKeyword();
-				break;
-				case 9 : connection();
-				break;
-				case 10 : System.out.println("à bientôt dans notre boutique :)");
-				break;					
-				default : System.out.println("veuillez saisir une valeur entre 1 et 8");
-				}
+					displayMenu();
+					choice = scanInt();
+					switch(choice) {
+					case 1 : addCourseToBasket();				
+					break;					
+					case 2 : removeCourseFromBasket();
+					break;					
+					case 3 : displayCart(true);
+					break;					
+					case 4 : displayCourses();
+					break;						
+					case 5 : displayCoursesByCategoryId();
+					break;
+					case 6 : displayAllCoursesIsRemote(true);
+					break;
+					case 7 : displayAllCoursesIsRemote(false);
+					break;
+					case 8 : searchByKeyword();
+					break;
+					case 9 : displayOneCourse();
+					break;
+					case 10 : connection();
+					break;
+					case 11 : System.out.println("à bientôt dans notre boutique :)");
+					break;					
+					default : System.out.println("veuillez saisir une valeur entre 1 et 10");
+					}
 				} catch (Exception e) {
 					System.out.println("Erreur: " + e.getMessage());
 				}
@@ -90,7 +94,7 @@ public class ShopApp {
 			courses.forEach(System.out::println);
 		}
 		else System.out.println("Aucune formation disponible actuellement en distanciel");
-		
+
 	}
 
 	private static void displayAllCoursesIsRemote(boolean isRemote) {
@@ -123,12 +127,15 @@ public class ShopApp {
 		System.out.println("6 : Afficher les formations en distanciel");
 		System.out.println("7 : Afficher les formations en présentiel");
 		System.out.println("8 : Rechercher une formation par mot clé");
-		System.out.println("9 : Connexion(Deconnexion) à votre compte");
-		System.out.println("10 : Sortir de l'application");
+		System.out.println("9 : Afficher les détails d'une formation");
+		System.out.println(login == null 
+				? "10 : Connexion à votre compte"
+						: "10 : Déconnexion");
+		System.out.println("11 : Sortir de l'application");
 	}
 
 	/**
-	 * Méthode qui affiche tous les articles en base en centrant le texte 
+	 * Méthode qui affiche toutes les formations en base en centrant le texte 
 	 */
 	public static void displayCourses() { 		
 		System.out.println(
@@ -143,7 +150,7 @@ public class ShopApp {
 	}
 
 	/**
-	 * Méthode qui affiche tous les articles par catégorie en utilisant printf
+	 * Méthode qui affiche toutes les formations par catégorie en utilisant printf
 	 */
 	private static void displayCoursesByCategoryId() {
 		displayCategories();
@@ -176,10 +183,10 @@ public class ShopApp {
 	}
 
 	/**
-	 * Méthode qui supprime un article du panier
+	 * Méthode qui supprime une formation du panier
 	 */
 	public static void removeCourseFromBasket() {
-		System.out.println("Selectionner l'id de l'article à supprimer du panier");
+		System.out.println("Selectionner l'id de la formation à supprimer du panier");
 		int id = scanInt();
 		if (business.getCart().stream().anyMatch(x -> x.getIdCourse() == id)) {
 			business.rmFromCart(id);
@@ -190,21 +197,21 @@ public class ShopApp {
 	}
 
 	/**
-	 * Méthode qui ajoute un article au panier
+	 * Méthode qui ajoute une formation au panier
 	 */
-	public static void addArticleToBasket() {
-		System.out.println("Selectionnez l'id de l'article à ajouter au panier:");
+	public static void addCourseToBasket() {
+		System.out.println("Selectionnez l'id de la formation à ajouter au panier:");
 		int id = scanInt();
 		Course course = business.readOneCourse(id);
 		if(course != null) {
 			if (business.getCart().stream().anyMatch(x -> x.getIdCourse() == id)) {
 				System.out.println("Vous avez déjà ajouté cette formation à votre panier.");
 			} else {
-			business.addToCart(course);
+				business.addToCart(course);
 			}
 			displayCart(false);
 		}
-		else System.out.println("L'article que vous souhaitez ajouter n'existe pas, vérifiez l'ID saisi.");
+		else System.out.println("La formation que vous souhaitez ajouter n'existe pas, vérifiez l'ID saisi.");
 	} 
 
 	/**
@@ -299,7 +306,7 @@ public class ShopApp {
 	 */
 	private static void connection() {
 		if(login != null) {
-			System.out.println("Souhaitez vous vous déconnecter ? Oui/Non");
+			System.out.println("Souhaitez-vous vous déconnecter ? Oui/Non");
 			String response = scan.next();
 			if(response.equalsIgnoreCase("Oui")) {
 				System.out.println("A bientôt " + login + TEXT_RESET);
@@ -318,7 +325,9 @@ public class ShopApp {
 				login = log;
 				idUser = id;
 				System.out.print(TEXT_BLUE);
+				if (authenticate.isAdmin(id) != null) adminSubMenu();
 			}
+
 			else {
 				System.out.println("login ou password incorrect");
 				System.out.println("Nouvel utilisateur, pour créer un compte, tapez ok");
@@ -328,6 +337,203 @@ public class ShopApp {
 				}
 			}
 		}
+	}
+
+	private static void adminSubMenu() {
+		try {
+			System.out.println("Bonjour " + login +". Vous êtes dans le sous-menu dédié aux administrateurs.");
+			IAdminImpl adminJobs = new IAdminImpl();
+			int choiceAdmin = 0;
+			while(choiceAdmin != 8) {
+				try {
+					System.out.println("\n" + "Pour réaliser une action, tapez le code correspondant");
+					
+					System.out.println("" + "1 : Ajouter une formation dans la bdd");
+					System.out.println("2 : Retirer une formation de la bdd");
+					System.out.println("3 : Mettre à jour une formation");
+					
+					System.out.println("" + "4 : Ajouter une catégorie dans la bdd");
+					System.out.println("5 : Retirer une catégorie de la bdd");
+					System.out.println("6 : Mettre à jour une catégorie");
+					
+					System.out.println("" + "7 : Afficher les commandes d'un client");
+					System.out.println("" +"8 : Quitter le sous-menu administrateur");			
+					
+					
+					choiceAdmin = scanInt();
+					switch(choiceAdmin) {
+					case 1 : addCourseToDb(adminJobs);				
+					break;					
+					case 2 : removeCourseFromDb(adminJobs);
+					break;					
+					case 3 : updateCourseFromDb(adminJobs);
+					break;					
+					case 4 : addCategoryToDb(adminJobs);
+					break;						
+					case 5 : removeCategoryFromDb(adminJobs);
+					break;
+					case 6 : updateCategoryFromDb(adminJobs);
+					break;
+					case 7 : displayOrderHistoryFromIdCustomer(adminJobs);
+					break;
+					case 8 : System.out.println("Vous quittez le menu admin..."+ TEXT_RESET);
+							login = null;
+							idUser = 0;
+					break;
+					default : System.out.println("veuillez saisir une valeur entre 1 et 8");
+					}
+				} catch (Exception e) {
+					System.out.println("Erreur: " + e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("Erreur lors de l'accès au menu Admin : " + e.getMessage());
+		}
+	}
+
+	private static void displayOrderHistoryFromIdCustomer(IAdminImpl adminJobs) {
+		ArrayList<Customer> customers = adminJobs.getAllCustomers();
+		if(customers.size()>0) {
+			customers.forEach(System.out::println);
+			System.out.println("Saisissez l'ID du client dont vous voulez connaitre l'historique : ");
+			int id = scanInt();
+			if (adminJobs.readCustomer(id) != null) {
+				ArrayList<Order> orders = adminJobs.getAllOrders(id);
+				if (orders.size()>0) {
+					orders.forEach(System.out::println);
+				} else System.out.println("Pas encore de commande à afficher");
+			}
+				
+			else System.out.println("L'ID saisi ne correspond à aucun client");
+		}
+		else System.out.println("Aucun client à afficher");
+		
+			
+	}
+
+	private static void updateCategoryFromDb(IAdminImpl adminJobs) {
+		displayCategories();
+		System.out.println("Saisissez l'ID de la catégorie que vous souhaitez supprimer : ");
+		int id = scanInt();
+		Category category = business.readOneCategory(id);
+		if(category != null) {
+			System.out.println("Saisissez le nouveau nom de la catégorie : (30 caractères max)");
+			String name = checkLength(scan.nextLine(), 30);
+			if (adminJobs.updateCategoryFromDb(category))
+				System.out.println("Mise à jour effectuée avec succès");
+			else System.out.println("Erreur lors de la MAJ");
+		}
+		else System.out.println("L'ID saisi ne correspond à aucune catégorie");
+
+		
+	}
+
+	private static void removeCategoryFromDb(IAdminImpl adminJobs) {
+		displayCategories();
+		System.out.println("Saisissez l'ID de la catégorie que vous souhaitez supprimer : ");
+		int id = scanInt();
+		if (adminJobs.removeCategoryFromDb(id))
+			System.out.println("Suppression effectué avec succès");
+		else System.out.println("Erreur lors de la suppression");
+	}
+
+	private static void addCategoryToDb(IAdminImpl adminJobs) {
+		System.out.println("Saisissez le nom de la catégorie : (30 caractères max)");
+		String name = checkLength(scan.nextLine(), 30);
+		
+		if (adminJobs.addCategoryToDb(new Category(name)))
+			System.out.println("Ajout effectué avec succès");
+		else System.out.println("Erreur lors de l'ajout");
+	}
+
+	private static void updateCourseFromDb(IAdminImpl adminJobs) {
+		System.out.println("Rappel des données de la formation:");
+		int id = displayOneCourse();
+		if (id != 0) {
+			Course updatedCourse = buildNewCourse();
+			updatedCourse.setIdCourse(id);
+			if (adminJobs.updateCourseFromDb(updatedCourse))
+				System.out.println("Mise à jour effectuée avec succès");
+			else System.out.println("Erreur lors de la mise à jour");
+		} 
+	}
+
+	private static int displayOneCourse() {
+		displayCourses();
+		System.out.println("Saisissez l'ID de la formation dont vous souhaitez afficher les détails: ");
+		int id = scanInt();
+		Course course = business.readOneCourse(id);
+		if ( course != null) {
+			System.out.println("ID: " + course.getIdCourse());
+			System.out.println("Nom: " + course.getName());
+			System.out.println("Description: " + course.getDescription());
+			System.out.println("Durée: " + course.getDurationInDays() + " jours");
+			System.out.println("Distanciel: " + (course.getIsRemote() ? "oui" : "non"));
+			System.out.println("Prix: " + course.getPrice() + "€");
+			Category category = business.readOneCategory(course.getCategory());
+			if(category != null) {
+				System.out.println("Catégorie: " + category.getName());
+			}
+			else System.out.println("Catégorie: Pas encore classé dans une catégorie");
+			
+			return id;
+		} else {
+			System.out.println("L'ID saisi ne correspond à aucune formation.");
+			return 0;
+		}
+	}
+
+	private static void removeCourseFromDb(IAdminImpl adminJobs) {
+		displayCourses();
+		System.out.println("Saisissez l'ID de la formation que vous souhaitez supprimer : ");
+		int id = scanInt();
+		if (adminJobs.removeCourseFromDb(id))
+			System.out.println("Suppression effectué avec succès");
+		else System.out.println("Erreur lors de la suppression");
+	}
+	
+	private static Course buildNewCourse() {
+		scan.nextLine();
+		System.out.println("\nSaisissez le nom de la formation : (30 caractères max)");
+		String name = checkLength(scan.nextLine(), 30);
+		System.out.println("Saisissez une brève description : (100 caractères max)");
+		String desc = checkLength(scan.nextLine(), 100);
+		System.out.println("Saisissez la durée en jours : ");
+		int duration = scanInt();;
+		System.out.println("La formation peut-elle être suivie en distanciel ? Oui/Non ");
+		String remote = scan.next();
+		boolean isRemote = false;
+		if (remote.equalsIgnoreCase("Oui")) {
+			isRemote = true;
+		}
+		System.out.println("Saisissez le prix de la formation:");
+		double price = Double.parseDouble(scan.next());
+		
+		//j'arrive pas à insérer une clé qui n'existe pas pour idCategory ou sans clé TODO
+		
+		System.out.println("Saisissez l'ID de la catégorie ou 0 si aucune catégorie ne s'applique:");
+		displayCategories();
+		int idCategory = scan.nextInt();
+		if (idCategory!=0) return new Course(name, desc, duration, isRemote, price, idCategory);
+		else return new Course(name, desc, duration, isRemote, price);
+		
+	}
+
+	private static void addCourseToDb(IAdminImpl adminJobs) {
+		if (adminJobs.addCourseToDb(buildNewCourse()))
+			System.out.println("Ajout effectué avec succès");
+		else System.out.println("Erreur lors de l'ajout");
+	}
+
+	private static String checkLength(String nextLine, int maxLength) {
+		String name = nextLine;
+		while (name.length()>maxLength) {
+			System.out.println("Votre saisie est trop longue, veuillez n'utiliser que " + maxLength + " caractères.");
+			name = scan.nextLine();
+		}
+		return name;
+		
 	}
 
 	/**

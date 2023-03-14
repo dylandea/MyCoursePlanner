@@ -22,14 +22,13 @@ public class CourseDao implements Dao<Course> {
 
 	@Override
 	public boolean create(Course obj) {
-		String str = "INSERT INTO T_Courses (Name, Description, DurationInDays, IsRemote, UnitaryPrice) VALUES (?,?,?,?,?,?);";	
+		String str = "INSERT INTO T_Courses (Name, Description, DurationInDays, IsRemote, UnitaryPrice) VALUES (?,?,?,?,?);";	
 		try (PreparedStatement ps = connection.prepareStatement(str)){
 			ps.setString(1, obj.getName());
 			ps.setString(2, obj.getDescription());
 			ps.setInt(3, obj.getDurationInDays());
 			ps.setBoolean(4, obj.getIsRemote());
 			ps.setDouble(5, obj.getPrice());	
-			ps.setInt(6, obj.getCategory());
 			if( ps.executeUpdate() == 1)	return true;
 		} catch (SQLException e) {
 			logger.severe("pb sql sur la création d'une formation " + e.getMessage());
@@ -72,6 +71,17 @@ public class CourseDao implements Dao<Course> {
 	public boolean delete(Course obj) {
 		try (Statement statement = connection.createStatement()){
 			String str = "DELETE FROM T_Courses where IdCourse=" + obj.getIdCourse() + ";";									
+			statement.executeUpdate(str);		
+			return true;
+		} catch (SQLException e) {
+			logger.severe("pb sql sur la suppression d'une formation " + e.getMessage());
+		} 	
+		return false;
+	}
+	
+	public boolean delete(int id) {
+		try (Statement statement = connection.createStatement()){
+			String str = "DELETE FROM T_Courses where IdCourse=" + id + ";";									
 			statement.executeUpdate(str);		
 			return true;
 		} catch (SQLException e) {

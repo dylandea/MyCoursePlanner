@@ -1,5 +1,6 @@
 package fr.fms.authentication;
 
+import fr.fms.dao.AdminDao;
 import fr.fms.dao.CustomerDao;
 import fr.fms.dao.Dao;
 import fr.fms.dao.DaoFactory;
@@ -10,6 +11,7 @@ import fr.fms.entities.Admin;
 
 public class Authenticate {
 	private Dao<Customer> customerDao = DaoFactory.getCustomerDao();
+	private Dao<Admin> adminDao = DaoFactory.getAdminDao();
 	private Dao<User> userDao = DaoFactory.getUserDao();
 
 	/**
@@ -50,5 +52,9 @@ public class Authenticate {
 
 	public boolean addCustomer(Customer customer) {
 		return customerDao.create(customer);		
+	}
+
+	public Admin isAdmin(int id) {
+		return ((AdminDao)adminDao).read(id);
 	}
 }

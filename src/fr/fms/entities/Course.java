@@ -23,6 +23,16 @@ public class Course {
 	}
 
 	
+	public Course(String name, String description, int durationInDays, boolean isRemote, double price, int category) {
+		this.name = name;
+		this.description = description;
+		this.durationInDays = durationInDays;
+		this.isRemote = isRemote;
+		this.price = price;
+		this.category = category;
+	}
+
+
 	public Course(String name, String description, int durationInDays, boolean isRemote, double price) {
 		this.name = name;
 		this.description = description;

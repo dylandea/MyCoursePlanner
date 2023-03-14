@@ -33,6 +33,8 @@ CREATE TABLE T_Admins (
 	FOREIGN KEY (idUser)	REFERENCES T_Users(idUser)
 ) ENGINE = InnoDB;
 
+INSERT INTO T_Admins ( lastName, firstName, email, idUser) VALUES ('De Albuquerque' ,'Dylan', 'dylan@gmail.com',1);
+
 -- -----------------------------------------------------------------------------
 -- - Construction de la table des clients	                                 ---
 -- -----------------------------------------------------------------------------
@@ -57,9 +59,10 @@ CREATE TABLE T_Categories (
 	CatName 				VARCHAR(30)  NOT NULL
 ) ENGINE = InnoDB;
 
-insert into T_Categories (IdCategory, CatName) values (1 , 'Bureautique');
-insert into T_Categories (IdCategory, CatName) values (2 , 'Programmation');
-insert into T_Categories (IdCategory, CatName) values (3 , 'Graphisme');
+insert into T_Categories (IdCategory, CatName) values (1 , 'Non categorises');
+insert into T_Categories (IdCategory, CatName) values (2 , 'Bureautique');
+insert into T_Categories (IdCategory, CatName) values (3 , 'Programmation');
+insert into T_Categories (IdCategory, CatName) values (4 , 'Graphisme');
 
 select * from t_categories;
 
@@ -70,22 +73,22 @@ CREATE TABLE T_Courses (
 	IdCourse				INT(4) 		 PRIMARY KEY AUTO_INCREMENT,
 	Name					varchar(30)	NOT NULL,
 	Description				varchar(100)	NOT NULL,
-	DaysLength					int(4) NOT NULL,
+	DurationInDays					int(4) NOT NULL,
 	IsRemote				tinyint(1) NOT NULL,
 	UnitaryPrice			float(8)	NOT NULL DEFAULT 0,
 	IdCategory				int(4),
 	FOREIGN KEY (IdCategory)	REFERENCES T_Categories(IdCategory)
 ) ENGINE = InnoDB;
 
-INSERT INTO T_Courses ( Name, Description, DaysLength , IsRemote, UnitaryPrice, IdCategory) VALUES ( 'Java'     ,	'Java SE 8 : Syntaxe et POO', 2, 0, 15.99, 2);
-INSERT INTO T_Courses ( Name, Description, DaysLength , IsRemote, UnitaryPrice, IdCategory) VALUES ( 'PHP frameworks'     ,	'Symphony et Laravel', 4, 1, 22, 2);
-INSERT INTO T_Courses ( Name, Description, DaysLength , IsRemote, UnitaryPrice, IdCategory) VALUES ( 'Spring'     ,	'Spring Core/MVC/Security', 5, 0, 30, 2);
+INSERT INTO T_Courses ( Name, Description, DurationInDays , IsRemote, UnitaryPrice, IdCategory) VALUES ( 'Java'     ,	'Java SE 8 : Syntaxe et POO', 2, 0, 15.99, 2);
+INSERT INTO T_Courses ( Name, Description, DurationInDays , IsRemote, UnitaryPrice, IdCategory) VALUES ( 'PHP frameworks'     ,	'Symphony et Laravel', 4, 1, 22, 2);
+INSERT INTO T_Courses ( Name, Description, DurationInDays , IsRemote, UnitaryPrice, IdCategory) VALUES ( 'Spring'     ,	'Spring Core/MVC/Security', 5, 0, 30, 2);
 
 
-INSERT INTO T_Courses ( Name, Description, DaysLength , IsRemote, UnitaryPrice, IdCategory) VALUES ( 'Blender'     ,	'Modelisation 3D, Design Objets', 14, 1, 35, 3);
+INSERT INTO T_Courses ( Name, Description, DurationInDays , IsRemote, UnitaryPrice, IdCategory) VALUES ( 'Blender'     ,	'Modelisation 3D, Design Objets', 14, 1, 35, 3);
 
-INSERT INTO T_Courses ( Name, Description, DaysLength , IsRemote, UnitaryPrice, IdCategory) VALUES ( 'Microsoft Office'     ,	'Office LTE 21.18, Prise en main', 5, 1, 31, 1);
-INSERT INTO T_Courses ( Name, Description, DaysLength , IsRemote, UnitaryPrice, IdCategory) VALUES ( 'Excel avance'     ,	'Computations complexes', 8, 0, 49.99, 1);
+INSERT INTO T_Courses ( Name, Description, DurationInDays , IsRemote, UnitaryPrice, IdCategory) VALUES ( 'Microsoft Office'     ,	'Office LTE 21.18, Prise en main', 5, 1, 31, 1);
+INSERT INTO T_Courses ( Name, Description, DurationInDays , IsRemote, UnitaryPrice, IdCategory) VALUES ( 'Excel avance'     ,	'Computations complexes', 8, 0, 49.99, 1);
 
 SELECT * FROM T_Courses;
 

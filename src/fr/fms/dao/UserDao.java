@@ -59,7 +59,7 @@ public class UserDao implements Dao<User> {
 	@Override
 	public boolean delete(User obj) {
 		try (Statement statement = connection.createStatement()){
-			String str = "DELETE FROM T_User where IdUser=" + obj.getId() + ";";									
+			String str = "DELETE FROM T_Users where IdUser=" + obj.getId() + ";";									
 			statement.executeUpdate(str);		
 		} catch (SQLException e) {
 			e.printStackTrace();

@@ -42,8 +42,25 @@ public class CategoryDao implements Dao<Category>{
 
 	@Override
 	public boolean delete(Category obj) {
-		// TODO Auto-generated method stub
-		return false;
+		try (Statement statement = connection.createStatement()){
+			String str = "DELETE FROM T_Categories where IdCategory=" + obj.getId() + ";";									
+			statement.executeUpdate(str);		
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean delete(int id) {
+		try (Statement statement = connection.createStatement()){
+			String str = "DELETE FROM T_Categories where IdCategory=" + id + ";";									
+			statement.executeUpdate(str);		
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 
 	@Override

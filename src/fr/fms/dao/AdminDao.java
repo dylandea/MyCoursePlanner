@@ -6,7 +6,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import fr.fms.entities.Admin;	
+import fr.fms.entities.Admin;
+import fr.fms.entities.Customer;	
 
 public class AdminDao implements Dao<Admin> {
 
@@ -18,7 +19,15 @@ public class AdminDao implements Dao<Admin> {
 
 	@Override
 	public Admin read(int id) {
-		// TODO Auto-generated method stub
+		String str = "select * from T_Admins where IdAdmin=?";
+		try(PreparedStatement ps = connection.prepareStatement(str)){
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
+			if(rs.next())
+				return new Admin(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getInt(5));
+		} catch (SQLException e) {
+			logger.severe("pb sql sur la lecture d'un client " + e.getMessage());
+		}
 		return null;
 	}
 
