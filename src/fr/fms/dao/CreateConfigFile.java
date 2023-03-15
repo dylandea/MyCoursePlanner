@@ -6,7 +6,7 @@ import java.util.Properties;
 
 /**
  * programme permettant de regénérer le fichier de configuration
- * @author El babili - 2022
+ * @author Dylan De Albuquerque - 2023
  * 
  */
 
@@ -15,9 +15,9 @@ public class CreateConfigFile {
 		try (OutputStream ops = new FileOutputStream("files/config.properties")) {		
 			Properties properties = new Properties();	
 			properties.setProperty("db.driver", "org.mariadb.jdbc.Driver");
-			properties.setProperty("db.url", "jdbc:mariadb://localhost:3306/Shop");
-			properties.setProperty("db.login", "root");
-			properties.setProperty("db.password", "fms2022");			
+			properties.setProperty("db.url", "jdbc:mariadb://localhost:3306/MyCoursePlanner");
+			properties.setProperty("db.login", "dylan");
+			properties.setProperty("db.password", "Tintin*64");			
 			//properties.store(ops , "No comment !");
 			//System.out.println("file config.properties generated ! ");
 		}

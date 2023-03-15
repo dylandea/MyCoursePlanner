@@ -1,5 +1,9 @@
 package fr.fms.dao;
 
+/**
+ * @author Dylan De Albuquerque - 2023
+ * 
+ */
 
 import fr.fms.entities.Admin;
 import fr.fms.entities.Category;

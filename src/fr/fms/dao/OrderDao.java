@@ -1,3 +1,9 @@
+/**
+ * Composant d'accès aux données de la table T_Orders dans la base de données MyCoursePlanner
+ * @author Dylan De Albuquerque - 2023
+ * 
+ */
+
 package fr.fms.dao;
 
 import java.sql.PreparedStatement;
@@ -6,7 +12,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
 import fr.fms.entities.Order;
 
@@ -50,7 +55,7 @@ public class OrderDao implements Dao<Order> {
 	}
 
 	public ArrayList<Order> readAll(int idCustomer) {
-		ArrayList<Order> orders = new ArrayList<>();
+		ArrayList<Order> orders = new ArrayList<Order>();
 		String strSql = "SELECT * FROM T_Orders where IdCustomer=" + idCustomer +";";
 
 		try(Statement statement = connection.createStatement ()){

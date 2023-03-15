@@ -1,3 +1,9 @@
+/**
+ * Composant d'accès aux données de la table T_Categories dans la base de données MyCoursePlanner
+ * @author Dylan De Albuquerque - 2023
+ * 
+ */
+
 package fr.fms.dao;
 
 import java.sql.Statement;
@@ -12,7 +18,7 @@ public class CategoryDao implements Dao<Category>{
 
 	@Override
 	public boolean create(Category obj) {
-		String str = "INSERT INTO T_Categories (Name) VALUES (?);";	
+		String str = "INSERT INTO T_Categories (CatName) VALUES (?);";	
 		try (PreparedStatement ps = connection.prepareStatement(str)){
 			ps.setString(1, obj.getName());
 			if( ps.executeUpdate() == 1)	return true;
@@ -30,13 +36,21 @@ public class CategoryDao implements Dao<Category>{
 			if(rs.next()) return new Category(rs.getInt(1) , rs.getString(2));
 		} catch (SQLException e) {
 			logger.severe("pb sql sur la lecture d'une catégorie " + e.getMessage());
-		} 	
+		}
 		return null;
 	}
 
 	@Override
 	public boolean update(Category obj) {
-		// TODO Auto-generated method stub
+		String str = "UPDATE T_Categories set CatName=? where idCategory=?;";	
+		try (PreparedStatement ps = connection.prepareStatement(str)){				
+			ps.setString(1, obj.getName());
+			ps.setInt(2, obj.getId());
+			if( ps.executeUpdate() == 1)	return true;
+			return true;
+		} catch (SQLException e) {
+			logger.severe("pb sql sur la mise à jour d'une catégorie " + e.getMessage());
+		} 	
 		return false;
 	}
 
@@ -53,14 +67,15 @@ public class CategoryDao implements Dao<Category>{
 	}
 	
 	public boolean delete(int id) {
-		try (Statement statement = connection.createStatement()){
-			String str = "DELETE FROM T_Categories where IdCategory=" + id + ";";									
-			statement.executeUpdate(str);		
+		String strDel = "DELETE FROM T_Categories where IdCategory=?;";
+		try (PreparedStatement ps = connection.prepareStatement(strDel)){
+			ps.setInt(1, id);
+			if ( ps.executeUpdate () == 1 ) 
+				return true;
 		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
+			throw new RuntimeException("Erreur lors de la suppression de la catégorie:\n" + e.getMessage());
 		}
-		return true;
+		return false;
 	}
 
 	@Override

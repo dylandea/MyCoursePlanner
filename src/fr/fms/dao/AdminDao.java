@@ -1,13 +1,17 @@
+/**
+ * Composant d'accès aux données de la table T_Admins dans la base de données MyCoursePlanner
+ * @author Dylan De Albuquerque - 2023
+ * 
+ */
+
 package fr.fms.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 import fr.fms.entities.Admin;
-import fr.fms.entities.Customer;	
 
 public class AdminDao implements Dao<Admin> {
 

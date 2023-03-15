@@ -1,5 +1,11 @@
 package fr.fms.dao;
 
+/**
+ * Composant d'accès aux données de la table T_Order_Items dans la base de données MyCoursePlanner
+ * @author Dylan De Albuquerque - 2023
+ * 
+ */
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,9 +21,8 @@ public class OrderItemDao implements Dao<OrderItem> {
 			ps.setInt(1, obj.getIdCourse());
 			ps.setDouble(2, obj.getUnitaryPrice());
 			ps.setInt(3, obj.getIdOrder());
-			
-			ps.executeUpdate();			
-			return true;
+					
+			if( ps.executeUpdate() == 1)	return true;
 		} catch (SQLException e) {
 			logger.severe("pb sql sur la création d'un orderItem : " + e.getMessage());
 		}

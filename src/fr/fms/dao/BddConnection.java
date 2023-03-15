@@ -2,7 +2,7 @@
  * Gestion de la connexion à la base à partir des données dans le fichier config.properties
  * Afin d'assurer qu'une seule connexion est établie pour tous les composants d'accès aux données,
  * nous avons utilisé ici un Singleton à l'aide du constructeur privé
- * @author El babili - 2023
+ * @author Dylan De Albuquerque - 2023
  */
 
 package fr.fms.dao;
@@ -53,6 +53,15 @@ public class BddConnection {
 	public static Connection getConnection() {	
 		if(connection == null) 	new BddConnection();
 		return connection;
+	}
+	/**
+	 * Méthode qui permet de fermer la connexion
+	 */
+	public static void closeConnection() {
+		try { 
+			connection.close();
+		} catch (Exception e) 
+		{ /* Ignored */ }
 	}
 	
 	/**

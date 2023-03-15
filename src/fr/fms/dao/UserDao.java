@@ -1,7 +1,6 @@
 /**
- * Composant d'accès aux données de la table T_Users
- * ToDo le password n'est pas crypté avant d'être stocké en base (Bcrypt)
- * @author El babili - 2022
+ * Composant d'accès aux données de la table T_Order_Items dans la base de données MyCoursePlanner
+ * @author Dylan De Albuquerque - 2023
  * 
  */
 
