@@ -191,7 +191,7 @@ public class ShopApp {
 				Category.centerString(COLUMN_NAME)
 				);
 		business.readCategories().forEach(System.out::println);
-				
+
 	}
 
 	/**
@@ -273,7 +273,7 @@ public class ShopApp {
 				int idOrder = business.order(idCustomer);	
 				if(idOrder == 0)	System.out.println("pb lors du passage de commande");
 				else {
-					System.out.println("Votre commande #" + idOrder + " a bien été validée !");
+					System.out.println("Votre commande N°" + idOrder + " a bien été validée !");
 					business.clearCart();
 				}
 			}
@@ -285,12 +285,12 @@ public class ShopApp {
 	 * @return id du client afin de l'associer à la commande en cours
 	 */
 	private static int newCustomer(int idUser) {
-		System.out.println("Avez vous déjà un compte client ? saisissez une adresse email valide pour vérifier :");
+		System.out.println("Avez vous déjà une fiche client ? saisissez une adresse email valide pour vérifier :");
 		String email = scan.next();		
 		if(isValidEmail(email)) {	
 			Customer customer = authenticate.existCustomerByEmail(email);
 			if(customer == null) {
-				System.out.println("Vous n'avez pas de compte chez nous, nous allons en créer un ensemble...");
+				System.out.println("Vous n'avez pas de fiche client chez nous, nous allons en créer une ensemble...");
 				scan.nextLine();	
 				System.out.println("saisissez votre nom de famille:");
 				String name = scan.nextLine();
@@ -306,7 +306,7 @@ public class ShopApp {
 					return authenticate.existCustomerByEmail(email).getIdCustomer();
 			}
 			else {
-				System.out.println("Nous allons associer la commande en cours avec le compte client : " + customer.getEmail());
+				System.out.println("Nous allons associer la commande en cours avec votre fiche client : " + customer.getEmail());
 				return customer.getIdCustomer();
 			}
 		}
@@ -329,6 +329,7 @@ public class ShopApp {
 			}				
 		}
 		else {
+
 			System.out.println("saisissez votre login : ");
 			String log = scan.next();
 			System.out.println("saisissez votre password : ");
@@ -339,16 +340,34 @@ public class ShopApp {
 				login = log;
 				idUser = id;
 				System.out.print(TEXT_BLUE);
-				if (authenticate.isAdmin(id) != null) adminSubMenu();
+				if (authenticate.isAdmin(id)) adminSubMenu();
 			}
 
 			else {
+
 				System.out.println("login ou password incorrect");
-				System.out.println("Nouvel utilisateur, pour créer un compte, tapez ok");
-				String ok = scan.next();
-				if(ok.equalsIgnoreCase("ok")) {
+				System.out.println("1 - Réessayer");
+				System.out.println("2 - Créer un compte");
+				System.out.println("3 - Annuler");
+
+				int choiceLog = scanInt();
+				switch (choiceLog) {
+				case 1:
+					connection();
+					break;
+				case 2:
 					newUser();
+					break;
+				case 3:
+					break;
+				default:
+					System.out.println("Mauvaise saisie");
+					break;
 				}
+
+
+
+
 			}
 		}
 	}
@@ -405,6 +424,7 @@ public class ShopApp {
 					System.out.println("Mauvaise saisie");
 				} catch (Exception e) {
 					System.out.println("Erreur: " + e.getMessage());
+					e.printStackTrace();
 				}
 			}
 		} catch (Exception e) {
@@ -471,16 +491,12 @@ public class ShopApp {
 	 */
 	private static void updateCategoryFromDb(IAdminImpl adminJobs) {
 
-		System.out.println(
-				Category.centerString(COLUMN_ID) +
-				Category.centerString(COLUMN_NAME)
-				);
-		business.readCategories().stream().filter(x->(x.getId()!=1)).forEach(System.out::println);
+		displayCategories();
 		System.out.println("Saisissez l'ID de la catégorie que vous souhaitez mettre à jour : ");
 		int id = scanInt();
-		
+
 		Category category = business.readOneCategory(id);
-		if (id == 1) category = null;
+
 		if(category != null) {
 
 			System.out.println("Saisissez le nouveau nom de la catégorie : (30 caractères max)");
@@ -501,20 +517,14 @@ public class ShopApp {
 	 */
 
 	private static void removeCategoryFromDb(IAdminImpl adminJobs) {
-		System.out.println(
-				Category.centerString(COLUMN_ID) +
-				Category.centerString(COLUMN_NAME)
-				);
-		business.readCategories().stream().filter(x->(x.getId()!=1)).forEach(System.out::println);
+		displayCategories();
 		System.out.println("Saisissez l'ID de la catégorie que vous souhaitez supprimer : ");
 		int id = scanInt();
-		if (id == 1) 
-			System.out.println("L'ID saisi ne correspond à aucune catégorie en bdd");
-		else {
-			if (adminJobs.removeCategoryFromDb(id))
-				System.out.println("Suppression effectué avec succès");
-			else System.out.println("L'ID saisi ne correspond à aucune catégorie en bdd");
-		}
+
+		if (adminJobs.removeCategoryFromDb(id))
+			System.out.println("Suppression effectué avec succès");
+		else System.out.println("L'ID saisi ne correspond à aucune catégorie en bdd");
+
 	}
 
 	/**
@@ -538,14 +548,84 @@ public class ShopApp {
 	 */
 
 	private static void updateCourseFromDb(IAdminImpl adminJobs) {
-		System.out.println("Rappel des données de la formation:");
 		int id = displayOneCourse();
 		if (id != 0) {
-			Course updatedCourse = buildNewCourse(adminJobs);
-			updatedCourse.setIdCourse(id);
+			Course originalCourse = business.readOneCourse(id);
+
+			String name = originalCourse.getName();
+			String desc =originalCourse.getDescription();	
+			int duration=originalCourse.getDurationInDays();
+			boolean isRemote = originalCourse.getIsRemote();
+			double price = originalCourse.getPrice();
+			int idCategory = originalCourse.getCategory();
+
+
+			int choiceUpdate = -1;
+			while(choiceUpdate != 0) {
+
+				System.out.println("\nQuel champ souhaitez-vous mettre à jour ? (Tapez 0 pour quitter le menu de mise à jour)");
+				System.out.println("1 - Nom");
+				System.out.println("2 - Description");
+				System.out.println("3 - Durée en jours");
+				System.out.println("4 - Distantiel possible?");
+				System.out.println("5 - Prix");
+				System.out.println("6 - Catégorie");
+				choiceUpdate = scanInt();
+				scan.nextLine();
+				switch (choiceUpdate) {
+				case 0:System.out.println("Vous quittez le menu de mise à jour...");
+
+
+				break;
+				case 1:System.out.println("Saisissez le nom de la formation : (30 caractères max)");
+				name = checkLength(scan.nextLine(), 30);
+
+				break;
+				case 2:System.out.println("Saisissez une brève description : (100 caractères max)");
+				desc = checkLength(scan.nextLine(), 100);
+
+				break;
+				case 3:System.out.println("Saisissez la durée en jours :");
+
+				duration = scanInt();
+				while (duration < 1) {
+					System.out.println("Erreur: minimum 1 jour");
+					System.out.println("Saisissez la durée en jours :");
+					duration = scanInt();
+				}
+
+				break;
+				case 4:System.out.println("La formation peut-elle être suivie en distanciel ? Oui/Non ");
+				String remote = scan.next();
+				isRemote = false;
+				if (remote.equalsIgnoreCase("Oui")) {
+					isRemote = true;
+				}
+
+				break;
+
+				case 5:System.out.println("Saisissez le prix de la formation: (exemple: 15,99)");
+				price = scanDouble();
+
+				break;
+
+				case 6:idCategory = checkCategory(adminJobs);
+
+				break;
+
+				default: System.out.println("Mauvaise valeur");
+				break;
+				}
+
+
+			}
+			//TODO
+			Course updatedCourse = new Course(originalCourse.getIdCourse(), name, desc, duration, isRemote, price, idCategory);
+			//			if (!updatedCourse.equals(originalCourse)) {
 			if (adminJobs.updateCourseFromDb(updatedCourse))
 				System.out.println("Mise à jour effectuée avec succès");
 			else System.out.println("Erreur lors de la mise à jour");
+			//			} else System.out.println("Aucun champ n'a été mis à jour");
 		} 
 	}
 
@@ -567,14 +647,25 @@ public class ShopApp {
 			System.out.println("Distanciel: " + (course.getIsRemote() ? "oui" : "non"));
 			System.out.println("Prix: " + course.getPrice() + "€");
 			Category category = business.readOneCategory(course.getCategory());
-			if(category != null) {
-				System.out.println("Catégorie: " + category.getName());
-			}
+			System.out.println("Catégorie: " + ((category==null)?"Non classé":category.getName()));
 
 			return id;
 		} else {
 			System.out.println("L'ID saisi ne correspond à aucune formation.");
 			return 0;
+		}
+	}
+
+	/**
+	 * Méthode qui finalise l'ajout d'une formation dans la BDD
+	 * @param adminJobs
+	 */
+	private static void addCourseToDb(IAdminImpl adminJobs) {
+		Course course = buildNewCourse(adminJobs);
+		if (course != null ) {
+			if (adminJobs.addCourseToDb(course))
+				System.out.println("Ajout effectué avec succès");
+			else System.out.println("Erreur lors de l'ajout");
 		}
 	}
 
@@ -588,7 +679,7 @@ public class ShopApp {
 		System.out.println("Saisissez l'ID de la formation que vous souhaitez supprimer : ");
 		int id = scanInt();
 		if (adminJobs.removeCourseFromDb(id))
-			System.out.println("Suppression effectué avec succès");
+			System.out.println("Suppression effectuée avec succès");
 		else System.out.println("Cette formation n'existe pas en BDD");
 	}
 
@@ -606,6 +697,11 @@ public class ShopApp {
 		String desc = checkLength(scan.nextLine(), 100);
 		System.out.println("Saisissez la durée en jours :");
 		int duration = scanInt();
+		while (duration < 1) {
+			System.out.println("Erreur: minimum 1 jour");
+			System.out.println("Saisissez la durée en jours :");
+			duration = scanInt();
+		}
 		System.out.println("La formation peut-elle être suivie en distanciel ? Oui/Non ");
 		String remote = scan.next();
 		boolean isRemote = false;
@@ -624,7 +720,7 @@ public class ShopApp {
 	 * Méthode qui vérifie si une catégorie existe
 	 * @param idCategory
 	 * @param adminJobs
-	 * @return
+	 * @return l'id de la categorie
 	 */
 	private static int checkCategory(IAdminImpl adminJobs) {
 		int idCategory = -1;
@@ -641,18 +737,7 @@ public class ShopApp {
 		return idCategory;
 	}
 
-	/**
-	 * Méthode qui finalise l'ajout d'une formation dans la BDD
-	 * @param adminJobs
-	 */
-	private static void addCourseToDb(IAdminImpl adminJobs) {
-		Course course = buildNewCourse(adminJobs);
-		if (course != null ) {
-			if (adminJobs.addCourseToDb(course))
-				System.out.println("Ajout effectué avec succès");
-			else System.out.println("Erreur lors de l'ajout");
-		}
-	}
+
 
 	/**
 	 * Méthode qui vérifie la longueur de la saisie utilisateur, pour empêcher des champs trops longs dans la BDD
@@ -674,7 +759,8 @@ public class ShopApp {
 	 * Méthode qui ajoute un nouvel utilisateur en base
 	 */
 	public static void newUser() {
-		System.out.println("saisissez un login :");
+
+		System.out.println("\nPour créer votre compte, saisissez un login :");
 		String login = scan.next();			
 		int id = authenticate.existUser(login);	
 		if(id == 0) { 
@@ -683,7 +769,7 @@ public class ShopApp {
 			authenticate.addUser(login,password);		
 			System.out.println("Ne perdez pas ces infos de connexion...");
 			stop(2);
-			System.out.println("création de l'utilisateur terminé, merci de vous connecter");
+			System.out.println("Création de l'utilisateur terminée, merci de vous connecter");
 		}
 		else	System.out.println("Login déjà existant en base, veuillez vous connecter");
 	}

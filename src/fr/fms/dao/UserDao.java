@@ -30,32 +30,6 @@ public class UserDao implements Dao<User> {
 	}
 
 	@Override
-	public User read(int id) {
-		try (Statement statement = connection.createStatement()){
-			String str = "SELECT * FROM T_Users where IdUser=" + id + ";";									
-			ResultSet rs = statement.executeQuery(str);
-			if(rs.next()) 
-				return new User(rs.getInt(1) , rs.getString(2) , rs.getString(3));
-		} catch (SQLException e) {
-			logger.severe("pb sql sur la lecture d'un user " + e.getMessage());
-		} 	
-		return null;
-	}
-
-	@Override
-	public boolean update(User obj) {
-		try (Statement statement = connection.createStatement()){
-			String str = "UPDATE T_Users set Login='" + obj.getLogin() +"' , " +
-							                "Password='" 		+ obj.getPwd() +"' , " + " where idUser=" + obj.getId() + ";";			
-			statement.executeUpdate(str);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		} 	
-		return true;
-	}
-
-	@Override
 	public boolean delete(User obj) {
 		try (Statement statement = connection.createStatement()){
 			String str = "DELETE FROM T_Users where IdUser=" + obj.getId() + ";";									
@@ -67,6 +41,47 @@ public class UserDao implements Dao<User> {
 		return true;
 	}
 
+	public User findUserByCredentials(String login, String password) {
+		String str = "SELECT * FROM T_Users where Login=? and Password=?;";
+		try (PreparedStatement ps = connection.prepareStatement(str)){
+			ps.setString(1, login);									
+			ps.setString(2, password);
+			ResultSet rs = ps.executeQuery();
+			if(rs.next()) 
+				return new User(rs.getInt(1) , rs.getString(2) , rs.getString(3));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} 	
+		return null;
+	}
+
+	public User findUserByLogin(String login) {
+		String str = "SELECT * FROM T_Users where Login=?;";
+		try (PreparedStatement ps = connection.prepareStatement(str)){
+			ps.setString(1, login);									
+			try (ResultSet rs = ps.executeQuery()){
+				if(rs.next()) 
+					return new User(rs.getInt(1) , rs.getString(2) , rs.getString(3));
+				}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} 	
+		return null;
+	}
+	
+	@Override
+	public User read(int id) {
+		try (Statement statement = connection.createStatement()){
+			String str = "SELECT * FROM T_Users where IdUser=" + id + ";";									
+			ResultSet rs = statement.executeQuery(str);
+			if(rs.next()) 
+				return new User(rs.getInt(1) , rs.getString(2) , rs.getString(3));
+		} catch (SQLException e) {
+			logger.severe("pb sql sur la lecture d'un user " + e.getMessage());
+		} 	
+		return null;
+	}
+	
 	@Override
 	public ArrayList<User> readAll() {
 		ArrayList<User> users = new ArrayList<User>();
@@ -85,32 +100,28 @@ public class UserDao implements Dao<User> {
 		}			
 		return users;
 	}
-	
-	public User findUserByCredentials(String login, String password) {
-		String str = "SELECT * FROM T_Users where Login=? and Password=?;";
-		try (PreparedStatement ps = connection.prepareStatement(str)){
-			ps.setString(1, login);									
-			ps.setString(2, password);
-			ResultSet rs = ps.executeQuery();
-			if(rs.next()) 
-				return new User(rs.getInt(1) , rs.getString(2) , rs.getString(3));
+
+	@Override
+	public boolean update(User obj) {
+		try (Statement statement = connection.createStatement()){
+			String str = "UPDATE T_Users set Login='" + obj.getLogin() +"' , " +
+							                "Password='" 		+ obj.getPwd() +"' , " + " where idUser=" + obj.getId() + ";";			
+			statement.executeUpdate(str);
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		} 	
-		return null;
+		return true;
 	}
-	
-	public User findUserByLogin(String login) {
-		String str = "SELECT * FROM T_Users where Login=?;";
-		try (PreparedStatement ps = connection.prepareStatement(str)){
-			ps.setString(1, login);									
-			try (ResultSet rs = ps.executeQuery()){
-				if(rs.next()) 
-					return new User(rs.getInt(1) , rs.getString(2) , rs.getString(3));
-				}
+
+	public boolean checkIsAdmin(int id) {
+		try (Statement statement = connection.createStatement()){
+			String str = "select * from t_user_role where iduser=" + id + " and idrole=1;";									
+			ResultSet rs = statement.executeQuery(str);
+			if(rs.next()) return true;
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.severe("pb sql sur la lecture d'un user " + e.getMessage());
 		} 	
-		return null;
+		return false;
 	}
 }

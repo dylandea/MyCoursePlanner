@@ -1,17 +1,14 @@
 package fr.fms.authentication;
 
-import fr.fms.dao.AdminDao;
 import fr.fms.dao.CustomerDao;
 import fr.fms.dao.Dao;
 import fr.fms.dao.DaoFactory;
 import fr.fms.dao.UserDao;
 import fr.fms.entities.Customer;
 import fr.fms.entities.User;
-import fr.fms.entities.Admin;
 
 public class Authenticate {
 	private Dao<Customer> customerDao = DaoFactory.getCustomerDao();
-	private Dao<Admin> adminDao = DaoFactory.getAdminDao();
 	private Dao<User> userDao = DaoFactory.getUserDao();
 
 	/**
@@ -69,9 +66,9 @@ public class Authenticate {
 	/**
 	 * Méthode qui vérifie si un utilisateur est un admin
 	 * @param id
-	 * @return
+	 * @return boolean
 	 */
-	public Admin isAdmin(int id) {
-		return ((AdminDao)adminDao).read(id);
+	public boolean isAdmin(int id) {
+		return ((UserDao)userDao).checkIsAdmin(id);
 	}
 }

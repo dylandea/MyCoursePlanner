@@ -22,47 +22,20 @@ public class CourseDao implements Dao<Course> {
 
 	@Override
 	public boolean create(Course obj) {
-		String str = "INSERT INTO T_Courses (Name, Description, DurationInDays, IsRemote, UnitaryPrice) VALUES (?,?,?,?,?);";	
+		String str = "INSERT INTO T_Courses (Name, Description, DurationInDays, IsRemote, UnitaryPrice, IdCategory) VALUES (?,?,?,?,?,?);";	
 		try (PreparedStatement ps = connection.prepareStatement(str)){
 			ps.setString(1, obj.getName());
 			ps.setString(2, obj.getDescription());
 			ps.setInt(3, obj.getDurationInDays());
 			ps.setBoolean(4, obj.getIsRemote());
 			ps.setDouble(5, obj.getPrice());	
+			if (obj.getCategory() == 0)
+				ps.setNull(6, 0);
+			else
+				ps.setInt(6, obj.getCategory());
 			if( ps.executeUpdate() == 1)	return true;
 		} catch (SQLException e) {
 			logger.severe("pb sql sur la création d'une formation " + e.getMessage());
-		} 	
-		return false;
-	}
-
-	@Override
-	public Course read(int id) {
-		try (Statement statement = connection.createStatement()){
-			String str = "SELECT * FROM T_Courses where IdCourse=" + id + ";";									
-			ResultSet rs = statement.executeQuery(str);
-			if(rs.next()) return new Course(rs.getInt(1) , rs.getString(2) , rs.getString(3) , rs.getInt(4), rs.getBoolean(5), rs.getDouble(6), rs.getInt(7));
-		} catch (SQLException e) {
-			logger.severe("pb sql sur la lecture d'une formation " + e.getMessage());
-		} 	
-		return null;
-	}
-
-	@Override
-	public boolean update(Course obj) {
-		String str = "UPDATE T_Courses set Name=? , Description=?  , DurationInDays=? , IsRemote=? , UnitaryPrice=? , IdCategory=? where idCourse=?;";	
-		try (PreparedStatement ps = connection.prepareStatement(str)){				
-			ps.setString(1, obj.getName());
-			ps.setString(2, obj.getDescription());
-			ps.setInt(3, obj.getDurationInDays());
-			ps.setBoolean(4, obj.getIsRemote());
-			ps.setDouble(5, obj.getPrice());	
-			ps.setInt(6, obj.getCategory());
-			ps.setInt(7, obj.getIdCourse());
-			if( ps.executeUpdate() == 1)	return true;
-			return true;
-		} catch (SQLException e) {
-			logger.severe("pb sql sur la mise à jour d'une formation " + e.getMessage());
 		} 	
 		return false;
 	}
@@ -78,7 +51,7 @@ public class CourseDao implements Dao<Course> {
 		} 	
 		return false;
 	}
-	
+
 	public boolean delete(int id) {
 		String strDel = "DELETE FROM T_Courses where IdCourse=?;";
 		try (PreparedStatement ps = connection.prepareStatement(strDel)){
@@ -91,6 +64,18 @@ public class CourseDao implements Dao<Course> {
 		return false;
 	}
 
+	@Override
+	public Course read(int id) {
+		try (Statement statement = connection.createStatement()){
+			String str = "SELECT * FROM T_Courses where IdCourse=" + id + ";";									
+			ResultSet rs = statement.executeQuery(str);
+			if(rs.next()) return new Course(rs.getInt(1) , rs.getString(2) , rs.getString(3) , rs.getInt(4), rs.getBoolean(5), rs.getDouble(6), rs.getInt(7));
+		} catch (SQLException e) {
+			logger.severe("pb sql sur la lecture d'une formation " + e.getMessage());
+		} 	
+		return null;
+	}
+	
 	@Override
 	public ArrayList<Course> readAll() {
 		ArrayList<Course> courses = new ArrayList<Course>();
@@ -116,7 +101,7 @@ public class CourseDao implements Dao<Course> {
 		}
 		return courses;
 	}
-	
+
 	public ArrayList<Course> readAllByCat(int id) {
 		ArrayList<Course> courses = new ArrayList<Course>();
 		String strSql = "SELECT * FROM T_Courses where idCategory=" + id;		
@@ -183,7 +168,7 @@ public class CourseDao implements Dao<Course> {
 		}			
 		return courses;
 	}
-
+	
 	public ArrayList<Course> readByKeyword(String keyword) {
 		ArrayList<Course> courses = new ArrayList<Course>();
 		
@@ -206,8 +191,27 @@ public class CourseDao implements Dao<Course> {
 		return courses;
 	}
 
+	@Override
+	public boolean update(Course obj) {
+		String str = "UPDATE T_Courses set Name=? , Description=?  , DurationInDays=? , IsRemote=? , UnitaryPrice=? , IdCategory=? where idCourse=?;";	
+		try (PreparedStatement ps = connection.prepareStatement(str)){				
+			ps.setString(1, obj.getName());
+			ps.setString(2, obj.getDescription());
+			ps.setInt(3, obj.getDurationInDays());
+			ps.setBoolean(4, obj.getIsRemote());
+			ps.setDouble(5, obj.getPrice());	
+			ps.setInt(6, obj.getCategory());
+			ps.setInt(7, obj.getIdCourse());
+			if( ps.executeUpdate() == 1)	return true;
+			return true;
+		} catch (SQLException e) {
+			logger.severe("pb sql sur la mise à jour d'une formation " + e.getMessage());
+		} 	
+		return false;
+	}
+
 	public boolean updateCourseCatBeforeCatRemoved(int idCategory) {
-		String str = "UPDATE T_Courses set IdCategory=1 where IdCategory=?;";	
+		String str = "UPDATE T_Courses set IdCategory=null where IdCategory=?;";	
 		try (PreparedStatement ps = connection.prepareStatement(str)){				
 			ps.setInt(1, idCategory);
 			

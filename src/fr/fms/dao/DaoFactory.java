@@ -5,7 +5,6 @@ package fr.fms.dao;
  * 
  */
 
-import fr.fms.entities.Admin;
 import fr.fms.entities.Category;
 import fr.fms.entities.Course;
 import fr.fms.entities.Customer;
@@ -21,10 +20,6 @@ public class DaoFactory {
 	
 	public static Dao<User> getUserDao() {
 		return new UserDao();
-	}
-	
-	public static Dao<Admin> getAdminDao() {
-		return new AdminDao();
 	}
 	
  	public static Dao<Category> getCategoryDao() {
