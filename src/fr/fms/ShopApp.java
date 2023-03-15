@@ -91,14 +91,8 @@ public class ShopApp {
 		String keyword = scan.nextLine();
 		ArrayList<Course> courses = business.readByKeyword(keyword);
 		if(courses.size()>0) {
-			System.out.println(
-					Course.centerString(COLUMN_ID) +
-					Course.centerString(COLUMN_NAME) + 
-					Course.centerString(COLUMN_DESCRIPTION) + 
-					Course.centerString(COLUMN_DAYS_DURATION) + 
-					Course.centerString(COLUMN_IS_REMOTE) + 
-					Course.centerString(COLUMN_PRICE)
-					);
+			//TODO
+			displayTitles();
 			courses.forEach(System.out::println);
 		}
 		else System.out.println("Aucune formation disponible actuellement en distanciel");
@@ -111,14 +105,8 @@ public class ShopApp {
 	private static void displayAllCoursesIsRemote(boolean isRemote) {
 		ArrayList<Course> courses = business.readAllRemoteOrNotRemoteCourses(isRemote);
 		if(courses.size()>0) {
-			System.out.println(
-					Course.centerString(COLUMN_ID) +
-					Course.centerString(COLUMN_NAME) + 
-					Course.centerString(COLUMN_DESCRIPTION) + 
-					Course.centerString(COLUMN_DAYS_DURATION) + 
-					Course.centerString(COLUMN_IS_REMOTE) + 
-					Course.centerString(COLUMN_PRICE)
-					);
+			//TODO
+			displayTitles();
 			courses.forEach(System.out::println);
 		}
 		else System.out.println("Aucune formation disponible en ce moment");
@@ -146,9 +134,10 @@ public class ShopApp {
 	}
 
 	/**
-	 * Méthode qui affiche toutes les formations en base en centrant le texte 
+	 * Méthode qui permet de factoriser l'affichage des titres de colonne pour les formations
 	 */
-	public static void displayCourses() { 		
+	public static void displayTitles() { 	
+		//TODO
 		System.out.println(
 				Course.centerString(COLUMN_ID) +
 				Course.centerString(COLUMN_NAME) + 
@@ -157,6 +146,14 @@ public class ShopApp {
 				Course.centerString(COLUMN_IS_REMOTE) + 
 				Course.centerString(COLUMN_PRICE)
 				);
+	}
+
+	/**
+	 * Méthode qui affiche toutes les formations en base en centrant le texte 
+	 */
+	public static void displayCourses() { 	
+		//TODO
+		displayTitles();
 		business.readCourses().forEach(System.out::println);
 	}
 
@@ -169,14 +166,8 @@ public class ShopApp {
 		int id = scanInt();
 		Category category = business.readOneCategory(id);
 		if(category != null) {
-			System.out.println(
-					Course.centerString(COLUMN_ID) +
-					Course.centerString(COLUMN_NAME) + 
-					Course.centerString(COLUMN_DESCRIPTION) + 
-					Course.centerString(COLUMN_DAYS_DURATION) + 
-					Course.centerString(COLUMN_IS_REMOTE) + 
-					Course.centerString(COLUMN_PRICE)
-					);
+			//TODO
+			displayTitles();
 			business.readCoursesByCatId(id).forEach(System.out::println);
 		}
 		else System.out.println("Cette catégorie n'existe pas !");
@@ -234,15 +225,7 @@ public class ShopApp {
 		if(business.isCartEmpty()) 	System.out.println("PANIER VIDE");
 		else {
 			System.out.println("CONTENU DU PANIER :");
-			String titles = 
-					Course.centerString(COLUMN_ID) +
-					Course.centerString(COLUMN_NAME) + 
-					Course.centerString(COLUMN_DESCRIPTION) + 
-					Course.centerString(COLUMN_DAYS_DURATION) + 
-					Course.centerString(COLUMN_IS_REMOTE) + 
-					Course.centerString(COLUMN_PRICE)
-					;
-			System.out.println(titles);
+			displayTitles();
 			business.getCart().forEach(System.out::println);
 			if(flag) {
 				System.out.println("MONTANT TOTAL : " + business.getTotal() + "€");
@@ -459,14 +442,8 @@ public class ShopApp {
 						scan.nextLine();
 						ArrayList<Course> courses = adminJobs.getCoursesFromThisOrder(choiceDetailledOrder);
 						if (courses != null) {
-							System.out.println(
-									Course.centerString(COLUMN_ID) +
-									Course.centerString(COLUMN_NAME) + 
-									Course.centerString(COLUMN_DESCRIPTION) + 
-									Course.centerString(COLUMN_DAYS_DURATION) + 
-									Course.centerString(COLUMN_IS_REMOTE) + 
-									Course.centerString(COLUMN_PRICE)
-									);
+							//TODO
+							displayTitles();
 							courses.forEach(System.out::println);
 						}
 
