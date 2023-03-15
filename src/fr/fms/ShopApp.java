@@ -7,11 +7,13 @@
 package fr.fms;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import fr.fms.authentication.Authenticate;
 import fr.fms.business.IAdminImpl;
 import fr.fms.business.IBusinessImpl;
+import fr.fms.dao.BddConnection;
 import fr.fms.entities.Course;
 import fr.fms.entities.Category;
 import fr.fms.entities.Customer;
@@ -65,8 +67,10 @@ public class ShopApp {
 					case 10 : connection();
 					break;
 					case 11 : System.out.println("à bientôt dans notre boutique :)");
+					scan.close();
+					BddConnection.closeConnection();
 					break;					
-					default : System.out.println("veuillez saisir une valeur entre 1 et 10");
+					default : System.out.println("Ce choix n'existe pas");
 					}
 				} catch (Exception e) {
 					System.out.println("Erreur: " + e.getMessage());
@@ -74,8 +78,12 @@ public class ShopApp {
 			}
 		} catch (Exception e) {
 			System.out.println("Erreur lors du lancement de l'application : " + e.getMessage());
-		}
+		} 
 	}
+
+	/**
+	 * Méthode qui permet de chercher des formations selon un mot clé
+	 */
 
 	private static void searchByKeyword() {
 		scan.nextLine();
@@ -96,9 +104,12 @@ public class ShopApp {
 		else System.out.println("Aucune formation disponible actuellement en distanciel");
 
 	}
-
+	/**
+	 * Méthode qui permet d'afficher toutes les formations selon si elles sont en distanciel ou pas
+	 * @param isRemote
+	 */
 	private static void displayAllCoursesIsRemote(boolean isRemote) {
-		ArrayList<Course> courses = business.readRemoteCourses(isRemote);
+		ArrayList<Course> courses = business.readAllRemoteOrNotRemoteCourses(isRemote);
 		if(courses.size()>0) {
 			System.out.println(
 					Course.centerString(COLUMN_ID) +
@@ -110,7 +121,7 @@ public class ShopApp {
 					);
 			courses.forEach(System.out::println);
 		}
-		else System.out.println("Aucune formation disponible actuellement en distanciel");
+		else System.out.println("Aucune formation disponible en ce moment");
 	}
 
 	/**
@@ -179,7 +190,8 @@ public class ShopApp {
 				Category.centerString(COLUMN_ID) +
 				Category.centerString(COLUMN_NAME)
 				);
-		business.readCategories().forEach(System.out::println);		
+		business.readCategories().forEach(System.out::println);
+				
 	}
 
 	/**
@@ -200,6 +212,7 @@ public class ShopApp {
 	 * Méthode qui ajoute une formation au panier
 	 */
 	public static void addCourseToBasket() {
+		displayCourses();
 		System.out.println("Selectionnez l'id de la formation à ajouter au panier:");
 		int id = scanInt();
 		Course course = business.readOneCourse(id);
@@ -232,7 +245,7 @@ public class ShopApp {
 			System.out.println(titles);
 			business.getCart().forEach(System.out::println);
 			if(flag) {
-				System.out.println("MONTANT TOTAL : " + business.getTotal());
+				System.out.println("MONTANT TOTAL : " + business.getTotal() + "€");
 				System.out.println("Souhaitez vous passer commande ? Oui/Non :");
 				if(scan.next().equalsIgnoreCase("Oui")) {
 					nextStep();
@@ -260,7 +273,7 @@ public class ShopApp {
 				int idOrder = business.order(idCustomer);	
 				if(idOrder == 0)	System.out.println("pb lors du passage de commande");
 				else {
-					System.out.println("Votre commande a bien été validé, voici son numéro : " + idOrder);
+					System.out.println("Votre commande #" + idOrder + " a bien été validée !");
 					business.clearCart();
 				}
 			}
@@ -277,8 +290,9 @@ public class ShopApp {
 		if(isValidEmail(email)) {	
 			Customer customer = authenticate.existCustomerByEmail(email);
 			if(customer == null) {
+				System.out.println("Vous n'avez pas de compte chez nous, nous allons en créer un ensemble...");
 				scan.nextLine();	
-				System.out.println("saisissez votre nom :");
+				System.out.println("saisissez votre nom de famille:");
 				String name = scan.nextLine();
 				System.out.println("saisissez votre prénom :");
 				String fName = scan.next();					
@@ -292,7 +306,7 @@ public class ShopApp {
 					return authenticate.existCustomerByEmail(email).getIdCustomer();
 			}
 			else {
-				System.out.println("Nous allons associer la commande en cours avec le compte client : " + customer);
+				System.out.println("Nous allons associer la commande en cours avec le compte client : " + customer.getEmail());
 				return customer.getIdCustomer();
 			}
 		}
@@ -339,6 +353,11 @@ public class ShopApp {
 		}
 	}
 
+	/**
+	 * Méthode qui ouvre un sous-menu spécial pour l'administrateur, qui lui permettra de gérer les formations et les catégories en BDD + d'afficher les commandes d'un client
+	 */
+
+
 	private static void adminSubMenu() {
 		try {
 			System.out.println("Bonjour " + login +". Vous êtes dans le sous-menu dédié aux administrateurs.");
@@ -347,19 +366,19 @@ public class ShopApp {
 			while(choiceAdmin != 8) {
 				try {
 					System.out.println("\n" + "Pour réaliser une action, tapez le code correspondant");
-					
-					System.out.println("" + "1 : Ajouter une formation dans la bdd");
+
+					System.out.println("1 : Ajouter une formation dans la bdd");
 					System.out.println("2 : Retirer une formation de la bdd");
 					System.out.println("3 : Mettre à jour une formation");
-					
-					System.out.println("" + "4 : Ajouter une catégorie dans la bdd");
+
+					System.out.println("4 : Ajouter une catégorie dans la bdd");
 					System.out.println("5 : Retirer une catégorie de la bdd");
 					System.out.println("6 : Mettre à jour une catégorie");
-					
-					System.out.println("" + "7 : Afficher les commandes d'un client");
-					System.out.println("" +"8 : Quitter le sous-menu administrateur");			
-					
-					
+
+					System.out.println("7 : Afficher les commandes d'un client");
+					System.out.println("8 : Quitter le sous-menu administrateur");			
+
+
 					choiceAdmin = scanInt();
 					switch(choiceAdmin) {
 					case 1 : addCourseToDb(adminJobs);				
@@ -377,14 +396,15 @@ public class ShopApp {
 					case 7 : displayOrderHistoryFromIdCustomer(adminJobs);
 					break;
 					case 8 : System.out.println("Vous quittez le menu admin..."+ TEXT_RESET);
-							login = null;
-							idUser = 0;
+					login = null;
+					idUser = 0;
 					break;
 					default : System.out.println("veuillez saisir une valeur entre 1 et 8");
 					}
+				} catch (InputMismatchException ime) {
+					System.out.println("Mauvaise saisie");
 				} catch (Exception e) {
 					System.out.println("Erreur: " + e.getMessage());
-					e.printStackTrace();
 				}
 			}
 		} catch (Exception e) {
@@ -392,72 +412,147 @@ public class ShopApp {
 		}
 	}
 
+	/**
+	 * Méthode qui permet d'afficher les commandes d'un utilisateur
+	 * @param adminJobs
+	 */
 	private static void displayOrderHistoryFromIdCustomer(IAdminImpl adminJobs) {
 		ArrayList<Customer> customers = adminJobs.getAllCustomers();
 		if(customers.size()>0) {
 			customers.forEach(System.out::println);
 			System.out.println("Saisissez l'ID du client dont vous voulez connaitre l'historique : ");
 			int id = scanInt();
+
 			if (adminJobs.readCustomer(id) != null) {
+
 				ArrayList<Order> orders = adminJobs.getAllOrders(id);
+
 				if (orders.size()>0) {
 					orders.forEach(System.out::println);
+					scan.nextLine();
+					System.out.println("Souhaitez-vous obtenir les détails d'une des commandes: Oui/non");
+					String choiceOrder=scan.nextLine();
+					while (choiceOrder.equalsIgnoreCase("oui")) {
+
+						System.out.println("Saisissez le N° de la commande dont vous voulez obtenir les détails:");
+						int choiceDetailledOrder = scanInt();
+						scan.nextLine();
+						ArrayList<Course> courses = adminJobs.getCoursesFromThisOrder(choiceDetailledOrder);
+						if (courses != null) {
+							System.out.println(
+									Course.centerString(COLUMN_ID) +
+									Course.centerString(COLUMN_NAME) + 
+									Course.centerString(COLUMN_DESCRIPTION) + 
+									Course.centerString(COLUMN_DAYS_DURATION) + 
+									Course.centerString(COLUMN_IS_REMOTE) + 
+									Course.centerString(COLUMN_PRICE)
+									);
+							courses.forEach(System.out::println);
+						}
+
+						System.out.println("Souhaitez-vous obtenir les détails d'une des commandes: Oui/non");
+						choiceOrder=scan.nextLine();
+					}
+
 				} else System.out.println("Pas encore de commande à afficher");
 			}
-				
+
 			else System.out.println("L'ID saisi ne correspond à aucun client");
 		}
 		else System.out.println("Aucun client à afficher");
-		
-			
+
+
 	}
 
+
+	/**
+	 * Methode qui pemet de mettre à jour une catégorie de la bdd
+	 * @param adminJobs
+	 */
 	private static void updateCategoryFromDb(IAdminImpl adminJobs) {
-		displayCategories();
-		System.out.println("Saisissez l'ID de la catégorie que vous souhaitez supprimer : ");
+
+		System.out.println(
+				Category.centerString(COLUMN_ID) +
+				Category.centerString(COLUMN_NAME)
+				);
+		business.readCategories().stream().filter(x->(x.getId()!=1)).forEach(System.out::println);
+		System.out.println("Saisissez l'ID de la catégorie que vous souhaitez mettre à jour : ");
 		int id = scanInt();
+		
 		Category category = business.readOneCategory(id);
+		if (id == 1) category = null;
 		if(category != null) {
+
 			System.out.println("Saisissez le nouveau nom de la catégorie : (30 caractères max)");
+			scan.nextLine();
 			String name = checkLength(scan.nextLine(), 30);
+			category.setName(name);
+
 			if (adminJobs.updateCategoryFromDb(category))
 				System.out.println("Mise à jour effectuée avec succès");
 			else System.out.println("Erreur lors de la MAJ");
 		}
 		else System.out.println("L'ID saisi ne correspond à aucune catégorie");
-
-		
 	}
+
+	/**
+	 * Methode qui pemet de supprimer une catégorie de la bdd
+	 * 
+	 */
 
 	private static void removeCategoryFromDb(IAdminImpl adminJobs) {
-		displayCategories();
+		System.out.println(
+				Category.centerString(COLUMN_ID) +
+				Category.centerString(COLUMN_NAME)
+				);
+		business.readCategories().stream().filter(x->(x.getId()!=1)).forEach(System.out::println);
 		System.out.println("Saisissez l'ID de la catégorie que vous souhaitez supprimer : ");
 		int id = scanInt();
-		if (adminJobs.removeCategoryFromDb(id))
-			System.out.println("Suppression effectué avec succès");
-		else System.out.println("Erreur lors de la suppression");
+		if (id == 1) 
+			System.out.println("L'ID saisi ne correspond à aucune catégorie en bdd");
+		else {
+			if (adminJobs.removeCategoryFromDb(id))
+				System.out.println("Suppression effectué avec succès");
+			else System.out.println("L'ID saisi ne correspond à aucune catégorie en bdd");
+		}
 	}
 
+	/**
+	 * Methode qui pemet d'ajouter une catégorie à la bdd
+	 * @param adminJobs
+	 */
+
 	private static void addCategoryToDb(IAdminImpl adminJobs) {
+		scan.nextLine();
 		System.out.println("Saisissez le nom de la catégorie : (30 caractères max)");
 		String name = checkLength(scan.nextLine(), 30);
-		
+
 		if (adminJobs.addCategoryToDb(new Category(name)))
 			System.out.println("Ajout effectué avec succès");
 		else System.out.println("Erreur lors de l'ajout");
 	}
 
+	/**
+	 * Methode qui pemet de mettre à jour une formation de la bdd
+	 * 
+	 */
+
 	private static void updateCourseFromDb(IAdminImpl adminJobs) {
 		System.out.println("Rappel des données de la formation:");
 		int id = displayOneCourse();
 		if (id != 0) {
-			Course updatedCourse = buildNewCourse();
+			Course updatedCourse = buildNewCourse(adminJobs);
 			updatedCourse.setIdCourse(id);
 			if (adminJobs.updateCourseFromDb(updatedCourse))
 				System.out.println("Mise à jour effectuée avec succès");
 			else System.out.println("Erreur lors de la mise à jour");
 		} 
 	}
+
+	/**
+	 * Methode qui pemet d'afficher une formation avec davantage de détails, la description en entier, le nom de la catégorie, etc...
+	 * @return
+	 */
 
 	private static int displayOneCourse() {
 		displayCourses();
@@ -475,8 +570,7 @@ public class ShopApp {
 			if(category != null) {
 				System.out.println("Catégorie: " + category.getName());
 			}
-			else System.out.println("Catégorie: Pas encore classé dans une catégorie");
-			
+
 			return id;
 		} else {
 			System.out.println("L'ID saisi ne correspond à aucune formation.");
@@ -484,48 +578,88 @@ public class ShopApp {
 		}
 	}
 
+	/**
+	 * Methode qui pemet de supprimer une formation de la bdd
+	 * @param adminJobs
+	 */
+
 	private static void removeCourseFromDb(IAdminImpl adminJobs) {
 		displayCourses();
 		System.out.println("Saisissez l'ID de la formation que vous souhaitez supprimer : ");
 		int id = scanInt();
 		if (adminJobs.removeCourseFromDb(id))
 			System.out.println("Suppression effectué avec succès");
-		else System.out.println("Erreur lors de la suppression");
+		else System.out.println("Cette formation n'existe pas en BDD");
 	}
-	
-	private static Course buildNewCourse() {
+
+	/**
+	 * Méthode qui permet de construire un nouvel objet Course avant d'en faire ce qu'on veut (update, create..)
+	 * @param adminJobs
+	 * @return
+	 */
+
+	private static Course buildNewCourse(IAdminImpl adminJobs) {
 		scan.nextLine();
 		System.out.println("\nSaisissez le nom de la formation : (30 caractères max)");
 		String name = checkLength(scan.nextLine(), 30);
 		System.out.println("Saisissez une brève description : (100 caractères max)");
 		String desc = checkLength(scan.nextLine(), 100);
-		System.out.println("Saisissez la durée en jours : ");
-		int duration = scanInt();;
+		System.out.println("Saisissez la durée en jours :");
+		int duration = scanInt();
 		System.out.println("La formation peut-elle être suivie en distanciel ? Oui/Non ");
 		String remote = scan.next();
 		boolean isRemote = false;
 		if (remote.equalsIgnoreCase("Oui")) {
 			isRemote = true;
 		}
-		System.out.println("Saisissez le prix de la formation:");
-		double price = Double.parseDouble(scan.next());
-		
-		//j'arrive pas à insérer une clé qui n'existe pas pour idCategory ou sans clé TODO
-		
-		System.out.println("Saisissez l'ID de la catégorie ou 0 si aucune catégorie ne s'applique:");
+		System.out.println("Saisissez le prix de la formation: (exemple: 15,99)");
+		double price = scanDouble();
+
+		int idCategory = checkCategory(adminJobs);
+
+		return new Course(name, desc, duration, isRemote, price, idCategory);
+	}
+
+	/**
+	 * Méthode qui vérifie si une catégorie existe
+	 * @param idCategory
+	 * @param adminJobs
+	 * @return
+	 */
+	private static int checkCategory(IAdminImpl adminJobs) {
+		int idCategory = -1;
+		System.out.println("Saisissez l'ID de la catégorie:");
 		displayCategories();
-		int idCategory = scan.nextInt();
-		if (idCategory!=0) return new Course(name, desc, duration, isRemote, price, idCategory);
-		else return new Course(name, desc, duration, isRemote, price);
-		
+		idCategory = scanInt();
+		while (adminJobs.checkIfCategoryExists(idCategory) == false) {
+			System.out.println("Erreur, cet ID ne correspond à aucune catégorie en bdd");
+			System.out.println("Saisissez l'ID de la catégorie:");
+			displayCategories();
+			idCategory = scanInt();
+
+		}
+		return idCategory;
 	}
 
+	/**
+	 * Méthode qui finalise l'ajout d'une formation dans la BDD
+	 * @param adminJobs
+	 */
 	private static void addCourseToDb(IAdminImpl adminJobs) {
-		if (adminJobs.addCourseToDb(buildNewCourse()))
-			System.out.println("Ajout effectué avec succès");
-		else System.out.println("Erreur lors de l'ajout");
+		Course course = buildNewCourse(adminJobs);
+		if (course != null ) {
+			if (adminJobs.addCourseToDb(course))
+				System.out.println("Ajout effectué avec succès");
+			else System.out.println("Erreur lors de l'ajout");
+		}
 	}
 
+	/**
+	 * Méthode qui vérifie la longueur de la saisie utilisateur, pour empêcher des champs trops longs dans la BDD
+	 * @param nextLine
+	 * @param maxLength
+	 * @return
+	 */
 	private static String checkLength(String nextLine, int maxLength) {
 		String name = nextLine;
 		while (name.length()>maxLength) {
@@ -533,7 +667,7 @@ public class ShopApp {
 			name = scan.nextLine();
 		}
 		return name;
-		
+
 	}
 
 	/**
@@ -554,6 +688,11 @@ public class ShopApp {
 		else	System.out.println("Login déjà existant en base, veuillez vous connecter");
 	}
 
+	/**
+	 * Méthode qui permet de donner l'impression que l'ordinateur réfléchit quelques secondes
+	 * @param time 
+	 */
+
 	public static void stop(int time) {
 		try {
 			Thread.sleep(time * 1000);
@@ -562,6 +701,11 @@ public class ShopApp {
 		}
 	}
 
+	/**
+	 * Méthode qui permet de gérer les saisies autres qu'un nombre entier, à utiliser à la place de scan.nextInt()
+	 * @return
+	 */
+
 	public static int scanInt() {
 		while(!scan.hasNextInt()) {
 			System.out.println("saisissez une valeur entière svp");
@@ -569,6 +713,25 @@ public class ShopApp {
 		}
 		return scan.nextInt();
 	}
+
+	/**
+	 * Méthode qui permet de gérer les saisies autres qu'un double, à utiliser à la place de scan.nextDouble()
+	 * @return
+	 */
+
+	public static double scanDouble() {
+		while(!scan.hasNextDouble()) {
+			System.out.println("saisissez une valeur valide svp");
+			scan.next();
+		}
+		return scan.nextDouble();
+	}
+
+	/**
+	 * Méthode qui vérifie que l'email saisi a bien un format d'email valide
+	 * @param email
+	 * @return
+	 */
 
 	public static boolean isValidEmail(String email) {
 		String regExp = "^[A-Za-z0-9._-]+@[A-Za-z0-9._-]+\\.[a-z][a-z]+$";	
