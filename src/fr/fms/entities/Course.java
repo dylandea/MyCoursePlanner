@@ -1,3 +1,8 @@
+/**
+ * @author Dylan De Albuquerque - 2023
+ * 
+ */
+
 package fr.fms.entities;
 
 public class Course {
@@ -11,6 +16,18 @@ public class Course {
 	
 	public static final int MAX_STRING_LENGTH = 30;
 	
+
+
+	public Course(int idCourse, String name, String description, int durationInDays, boolean isRemote, double price,
+			int category) {
+		this.idCourse = idCourse;
+		this.name = name;
+		this.description = description;
+		this.durationInDays = durationInDays;
+		this.isRemote = isRemote;
+		this.price = price;
+		this.category = category;
+	}
 
 
 	public Course(int idCourse, String name, String description, int durationInDays, boolean isRemote, double price) {

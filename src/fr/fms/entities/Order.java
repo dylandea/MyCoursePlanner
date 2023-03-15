@@ -1,3 +1,8 @@
+
+/**
+ * @author Dylan De Albuquerque - 2023
+ * 
+ */
 package fr.fms.entities;
 
 import java.text.DateFormat;
@@ -10,7 +15,8 @@ public class Order {
 	private Date date;
 	private int idCustomer;
 	private static final DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.FRANCE);
-	
+
+
 	public Order(int idOrder, double amount, Date date, int idCustomer) {
 		this.idOrder = idOrder;
 		this.amount = amount;
@@ -55,6 +61,14 @@ public class Order {
 	public void setIdCustomer(int idCustomer) {
 		this.idCustomer = idCustomer;
 	}
+
+//	public ArrayList<Course> getItems() {
+//		return items;
+//	}
+//
+//	public void setItems(ArrayList<Course> items) {
+//		this.items = items;
+//	}
 
 	@Override
 	public String toString() {

@@ -25,7 +25,7 @@ public class Authenticate {
 		if(user != null )	return user.getId();
 		return 0;
 	}
-	
+
 	/**
 	 * méthode qui vérifie si login correspond à un utilisateur en base
 	 * @param log
@@ -46,14 +46,31 @@ public class Authenticate {
 		return ((CustomerDao)customerDao).findCustomerByEmail(email);
 	}
 
+	/**
+	 * Méthode qui rajoute un utilisateur dans la bdd
+	 * @param email
+	 * @param password
+	 */
+
 	public void addUser(String email, String password) {
 		userDao.create(new User(email, password));		
 	}
+
+	/**
+	 * Methode qui rajoute un client dans la bdd
+	 * @param customer
+	 * @return
+	 */
 
 	public boolean addCustomer(Customer customer) {
 		return customerDao.create(customer);		
 	}
 
+	/**
+	 * Méthode qui vérifie si un utilisateur est un admin
+	 * @param id
+	 * @return
+	 */
 	public Admin isAdmin(int id) {
 		return ((AdminDao)adminDao).read(id);
 	}

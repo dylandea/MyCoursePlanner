@@ -1,3 +1,8 @@
+/**
+ * @author Dylan De Albuquerque - 2023
+ * 
+ */
+
 package fr.fms.entities;
 
 public class Customer {
@@ -96,6 +101,6 @@ public class Customer {
 	
 	@Override
 	public String toString() {
-		return " " + lastName + " , " + firstName + " , " + email + " , " + phone + " , " + address;
+		return "Client N°" + idCustomer + ", Nom:" + lastName + ", Prénom:" + firstName + ", Email:" + email + ", Tel:" + phone + ", Adresse:" + address;
 	}
 }

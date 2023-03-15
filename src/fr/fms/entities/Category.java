@@ -1,3 +1,8 @@
+/**
+ * @author Dylan De Albuquerque - 2023
+ * 
+ */
+
 package fr.fms.entities;
 
 public class Category {
