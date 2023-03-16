@@ -200,7 +200,10 @@ public class CourseDao implements Dao<Course> {
 			ps.setInt(3, obj.getDurationInDays());
 			ps.setBoolean(4, obj.getIsRemote());
 			ps.setDouble(5, obj.getPrice());	
-			ps.setInt(6, obj.getCategory());
+			if (obj.getCategory() == 0)
+				ps.setNull(6, 0);
+			else
+				ps.setInt(6, obj.getCategory());
 			ps.setInt(7, obj.getIdCourse());
 			if( ps.executeUpdate() == 1)	return true;
 			return true;
@@ -216,7 +219,6 @@ public class CourseDao implements Dao<Course> {
 			ps.setInt(1, idCategory);
 			
 			if( ps.executeUpdate() == 1)	return true;
-			return true;
 		} catch (SQLException e) {
 			logger.severe("pb sql sur la mise à jour des formations " + e.getMessage());
 		} 	

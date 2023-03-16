@@ -13,8 +13,8 @@ public class Authenticate {
 
 	/**
 	 * méthode qui vérifie si login et pwd correspond à un utilisateur en base
-	 * @param log
-	 * @param pwd
+	 * @param log l'identifiant de l'utilisateur
+	 * @param pwd mot de passe de l'utilisateur
 	 * @return id de l'utilisateur, 0 si non trouvé
 	 */
 	public int existUser(String log, String pwd) {
@@ -25,7 +25,7 @@ public class Authenticate {
 
 	/**
 	 * méthode qui vérifie si login correspond à un utilisateur en base
-	 * @param log
+	 * @param log identifiant de l'utilisateur
 	 * @return id de l'utilisateur, 0 si non trouvé
 	 */
 	public int existUser(String log) {
@@ -36,8 +36,8 @@ public class Authenticate {
 
 	/**
 	 * méthode qui renvoi un client correspondant à un email (unique en base)
-	 * @param email 
-	 * @return client
+	 * @param email email de l'utilisateur
+	 * @return client un objet Customer
 	 */
 	public Customer existCustomerByEmail(String email) {
 		return ((CustomerDao)customerDao).findCustomerByEmail(email);
@@ -45,8 +45,8 @@ public class Authenticate {
 
 	/**
 	 * Méthode qui rajoute un utilisateur dans la bdd
-	 * @param email
-	 * @param password
+	 * @param email email de l'utilisateur
+	 * @param password mot de passe de l'utilisateur
 	 */
 
 	public void addUser(String email, String password) {
@@ -55,8 +55,8 @@ public class Authenticate {
 
 	/**
 	 * Methode qui rajoute un client dans la bdd
-	 * @param customer
-	 * @return
+	 * @param customer prend un objet Customer
+	 * @return true si la création s'est bien passée
 	 */
 
 	public boolean addCustomer(Customer customer) {
@@ -65,8 +65,8 @@ public class Authenticate {
 
 	/**
 	 * Méthode qui vérifie si un utilisateur est un admin
-	 * @param id
-	 * @return boolean
+	 * @param id id de l'utilisateur
+	 * @return boolean vrai si c'est un admin
 	 */
 	public boolean isAdmin(int id) {
 		return ((UserDao)userDao).checkIsAdmin(id);

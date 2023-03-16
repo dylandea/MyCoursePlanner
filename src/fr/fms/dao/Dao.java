@@ -43,7 +43,7 @@ public interface Dao<T> {
 	
 	/**
 	 * renvoi tous les objets de la table correspondante
-	 * @return ArrayList<T> correspondant 
+	 * @return ArrayList correspondant 
 	 */
 	public ArrayList<T> readAll();
 }

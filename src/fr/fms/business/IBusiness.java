@@ -12,13 +12,13 @@ import fr.fms.entities.Course;
 public interface IBusiness {	
 	/**
 	 * méthode qui ajoute une formation au panier
-	 * @param formation à ajouter
+	 * @param course formation à ajouter
 	 */
 	public void addToCart(Course course);		
 	
 	/**
 	 * méthode qui retire une formation au panier si elle est dedans
-	 * @param id de la formation à retirer
+	 * @param id id de la formation à retirer
 	 */
 	public void rmFromCart(int id);		
 	
@@ -32,7 +32,7 @@ public interface IBusiness {
 	 * méthode qui réalise la commande en base avec l'idUser + total de la commande en cours + date du jour + contenu du panier :
 	 * - la méthode va céer une commande en base -> idOrder + montant + date + idUser
 	 * - puis va ajouter autant de commandes minifiées associées : orderItem -> idOrderItem + idCourse  + Price + idOrder
-	 * @param idUser est l'identifiant du client qui est passé commande
+	 * @param idCustomer est l'identifiant du client qui est passé commande
 	 * @return 1 si tout est ok 0 si pb 
 	 */
 	public int order(int idCustomer);		
@@ -45,7 +45,7 @@ public interface IBusiness {
 	
 	/**
 	 * méthode qui renvoie la formation correspondant à l'id
-	 * @param id de la formation à renvoyer
+	 * @param id id de la formation à renvoyer
 	 * @return formation correspondante si trouvée, null sinon
 	 */
 	public Course readOneCourse(int id);	
@@ -58,14 +58,14 @@ public interface IBusiness {
 	
 	/**
 	 * méthode qui renvoi toutes les formations d'une catégorie
-	 * @param id de la catégorie
+	 * @param idCat id de la catégorie
 	 * @return Liste de formations
 	 */
 	public ArrayList<Course> readCoursesByCatId(int idCat);
 
 	/**
 	 * Méthode qui selon la valeur (true ou false) qui lui est donnée permet de renvoyer soit les formations qui se font en distanciel, soit celles en présentiel 
-	 * @param boolean isRemote
+	 * @param isRemote booleen
 	 * @return
 	 */
 	public ArrayList<Course> readAllRemoteOrNotRemoteCourses(boolean isRemote);
@@ -79,12 +79,13 @@ public interface IBusiness {
 
 	/**
 	 * Methode qui vide le panier
-	 * @return
+	 * 
 	 */
 	void clearCart();
 
 	/**
 	 * Methode qui renvoie une catégorie après l'avoir cherché en bdd
+	 * @param id id de la catégorie
 	 * @return
 	 */
 	Category readOneCategory(int id);

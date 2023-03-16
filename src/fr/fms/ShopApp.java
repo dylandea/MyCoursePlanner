@@ -91,11 +91,10 @@ public class ShopApp {
 		String keyword = scan.nextLine();
 		ArrayList<Course> courses = business.readByKeyword(keyword);
 		if(courses.size()>0) {
-			//TODO
 			displayTitles();
 			courses.forEach(System.out::println);
 		}
-		else System.out.println("Aucune formation disponible actuellement en distanciel");
+		else System.out.println("Aucune formation disponible en ce moment.");
 
 	}
 	/**
@@ -105,11 +104,10 @@ public class ShopApp {
 	private static void displayAllCoursesIsRemote(boolean isRemote) {
 		ArrayList<Course> courses = business.readAllRemoteOrNotRemoteCourses(isRemote);
 		if(courses.size()>0) {
-			//TODO
 			displayTitles();
 			courses.forEach(System.out::println);
 		}
-		else System.out.println("Aucune formation disponible en ce moment");
+		else System.out.println("Aucune formation disponible en ce moment.");
 	}
 
 	/**
@@ -137,7 +135,6 @@ public class ShopApp {
 	 * Méthode qui permet de factoriser l'affichage des titres de colonne pour les formations
 	 */
 	public static void displayTitles() { 	
-		//TODO
 		System.out.println(
 				Course.centerString(COLUMN_ID) +
 				Course.centerString(COLUMN_NAME) + 
@@ -152,7 +149,6 @@ public class ShopApp {
 	 * Méthode qui affiche toutes les formations en base en centrant le texte 
 	 */
 	public static void displayCourses() { 	
-		//TODO
 		displayTitles();
 		business.readCourses().forEach(System.out::println);
 	}
@@ -166,7 +162,6 @@ public class ShopApp {
 		int id = scanInt();
 		Category category = business.readOneCategory(id);
 		if(category != null) {
-			//TODO
 			displayTitles();
 			business.readCoursesByCatId(id).forEach(System.out::println);
 		}
@@ -189,6 +184,7 @@ public class ShopApp {
 	 * Méthode qui supprime une formation du panier
 	 */
 	public static void removeCourseFromBasket() {
+		displayCourses();
 		System.out.println("Selectionner l'id de la formation à supprimer du panier");
 		int id = scanInt();
 		if (business.getCart().stream().anyMatch(x -> x.getIdCourse() == id)) {
@@ -222,6 +218,7 @@ public class ShopApp {
 	 * Méthode qui affiche le contenu du panier + total de la commande + propose de passer commande
 	 */
 	private static void displayCart(boolean flag) {
+		System.out.println();
 		if(business.isCartEmpty()) 	System.out.println("PANIER VIDE");
 		else {
 			System.out.println("CONTENU DU PANIER :");
@@ -229,7 +226,7 @@ public class ShopApp {
 			business.getCart().forEach(System.out::println);
 			if(flag) {
 				System.out.println("MONTANT TOTAL : " + business.getTotal() + "€");
-				System.out.println("Souhaitez vous passer commande ? Oui/Non :");
+				System.out.println("\nSouhaitez vous passer commande ? Oui/Non :");
 				if(scan.next().equalsIgnoreCase("Oui")) {
 					nextStep();
 				}
@@ -420,12 +417,13 @@ public class ShopApp {
 	 * @param adminJobs
 	 */
 	private static void displayOrderHistoryFromIdCustomer(IAdminImpl adminJobs) {
+		System.out.println();
 		ArrayList<Customer> customers = adminJobs.getAllCustomers();
 		if(customers.size()>0) {
 			customers.forEach(System.out::println);
-			System.out.println("Saisissez l'ID du client dont vous voulez connaitre l'historique : ");
+			System.out.println("\nSaisissez l'ID du client dont vous voulez connaitre l'historique : ");
 			int id = scanInt();
-
+			System.out.println();
 			if (adminJobs.readCustomer(id) != null) {
 
 				ArrayList<Order> orders = adminJobs.getAllOrders(id);
@@ -437,17 +435,16 @@ public class ShopApp {
 					String choiceOrder=scan.nextLine();
 					while (choiceOrder.equalsIgnoreCase("oui")) {
 
-						System.out.println("Saisissez le N° de la commande dont vous voulez obtenir les détails:");
+						System.out.println("\nSaisissez le N° de la commande dont vous voulez obtenir les détails:");
 						int choiceDetailledOrder = scanInt();
 						scan.nextLine();
 						ArrayList<Course> courses = adminJobs.getCoursesFromThisOrder(choiceDetailledOrder);
 						if (courses != null) {
-							//TODO
 							displayTitles();
 							courses.forEach(System.out::println);
 						}
 
-						System.out.println("Souhaitez-vous obtenir les détails d'une des commandes: Oui/non");
+						System.out.println("\nSouhaitez-vous obtenir les détails d'une des commandes: Oui/non");
 						choiceOrder=scan.nextLine();
 					}
 
@@ -544,10 +541,11 @@ public class ShopApp {
 				System.out.println("1 - Nom");
 				System.out.println("2 - Description");
 				System.out.println("3 - Durée en jours");
-				System.out.println("4 - Distantiel possible?");
+				System.out.println("4 - Distanciel");
 				System.out.println("5 - Prix");
 				System.out.println("6 - Catégorie");
 				choiceUpdate = scanInt();
+				System.out.println();
 				scan.nextLine();
 				switch (choiceUpdate) {
 				case 0:System.out.println("Vous quittez le menu de mise à jour...");
@@ -572,7 +570,7 @@ public class ShopApp {
 				}
 
 				break;
-				case 4:System.out.println("La formation peut-elle être suivie en distanciel ? Oui/Non ");
+				case 4:System.out.println("La formation est-elle prodiguée en distanciel ? Oui/Non ");
 				String remote = scan.next();
 				isRemote = false;
 				if (remote.equalsIgnoreCase("Oui")) {
@@ -583,6 +581,7 @@ public class ShopApp {
 
 				case 5:System.out.println("Saisissez le prix de la formation: (exemple: 15,99)");
 				price = scanDouble();
+
 
 				break;
 
@@ -596,13 +595,11 @@ public class ShopApp {
 
 
 			}
-			//TODO
 			Course updatedCourse = new Course(originalCourse.getIdCourse(), name, desc, duration, isRemote, price, idCategory);
-			//			if (!updatedCourse.equals(originalCourse)) {
+
 			if (adminJobs.updateCourseFromDb(updatedCourse))
 				System.out.println("Mise à jour effectuée avec succès");
 			else System.out.println("Erreur lors de la mise à jour");
-			//			} else System.out.println("Aucun champ n'a été mis à jour");
 		} 
 	}
 
@@ -613,11 +610,11 @@ public class ShopApp {
 
 	private static int displayOneCourse() {
 		displayCourses();
-		System.out.println("Saisissez l'ID de la formation dont vous souhaitez afficher les détails: ");
+		System.out.println("\nSaisissez l'ID de la formation dont vous souhaitez afficher les détails: \n");
 		int id = scanInt();
 		Course course = business.readOneCourse(id);
 		if ( course != null) {
-			System.out.println("ID: " + course.getIdCourse());
+			System.out.println("ID de la formation: " + course.getIdCourse());
 			System.out.println("Nom: " + course.getName());
 			System.out.println("Description: " + course.getDescription());
 			System.out.println("Durée: " + course.getDurationInDays() + " jours");
@@ -688,6 +685,7 @@ public class ShopApp {
 		System.out.println("Saisissez le prix de la formation: (exemple: 15,99)");
 		double price = scanDouble();
 
+
 		int idCategory = checkCategory(adminJobs);
 
 		return new Course(name, desc, duration, isRemote, price, idCategory);
@@ -701,15 +699,14 @@ public class ShopApp {
 	 */
 	private static int checkCategory(IAdminImpl adminJobs) {
 		int idCategory = -1;
-		System.out.println("Saisissez l'ID de la catégorie:");
+		System.out.println("Saisissez l'ID de la catégorie, ou tapez 0 pour ne pas la classer dans une catégorie:");
 		displayCategories();
 		idCategory = scanInt();
-		while (adminJobs.checkIfCategoryExists(idCategory) == false) {
+		while (adminJobs.checkIfCategoryExists(idCategory) == false && idCategory!=0) {
 			System.out.println("Erreur, cet ID ne correspond à aucune catégorie en bdd");
-			System.out.println("Saisissez l'ID de la catégorie:");
+			System.out.println("\nSaisissez l'ID de la catégorie, ou tapez 0 pour ne pas la classer dans une catégorie:");
 			displayCategories();
 			idCategory = scanInt();
-
 		}
 		return idCategory;
 	}
